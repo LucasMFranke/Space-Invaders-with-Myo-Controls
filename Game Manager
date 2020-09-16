@@ -1,0 +1,320 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class GameManager : MonoBehaviour
+{
+    public Transform enemySpawnPoint;
+    public Transform barrierSpawnPoint;
+    public Transform playerSpawnPoint;
+    public Transform Display1Spawn;
+    public Transform Display2Spawn;
+    public Transform Display3Spawn;
+    public GameObject Invader1;
+    public GameObject Invader2;
+    public GameObject Invader3;
+    public GameObject Barrier;
+    public GameObject Player;
+    public GameObject Display1;
+    public GameObject Display2;
+    public GameObject Display3;
+    public GUISkin layout;
+    public bool lose = false;
+    public int Row1Killed = 0;
+    public int Row2Killed = 0;
+    public int Row3Killed = 0;
+    public int totalKilled = 0;
+    public int totalRow1Killed = 0;
+    public int totalRow2Killed = 0;
+    public int totalRow3Killed = 0;
+    bool Row1Exists;
+    bool Row2Exists;
+    bool Row3Exists;
+    bool Display1Exists = false;
+    bool Display2Exists = false;
+    bool Display3Exists = false;
+    int scoreSave = 0;
+    public int levelScore = 0;
+    int score = 0;
+    bool menu = true;
+
+   // Start is called before the first frame update
+    void Start()
+    {
+        PlayerPrefs.GetInt("HighScore");
+        Row1Exists = false;
+        Row2Exists = false;
+        Row3Exists = false;
+    }
+
+    void Restart()
+    {
+        score = 0;
+        scoreSave = 0;
+        lose = false;
+        totalRow1Killed = 0;
+        totalRow2Killed = 0;
+        totalRow3Killed = 0;
+        PlayerPrefs.GetInt("HighScore");
+        if (GameObject.Find("Player(Clone)") != null)
+        {
+            Destroy(GameObject.Find("Player(Clone)"));
+        }
+        SpawnPlayer();
+        SpawnInvader1();
+        Row1Exists = true;
+        SpawnInvader2();
+        Row2Exists = true;
+        SpawnInvader3();
+        Row3Exists = true;
+        GameObject Row1= GameObject.Find("Invader1(Clone)");
+        GameObject Row2 = GameObject.Find("Invader2(Clone)");
+        GameObject Row3 = GameObject.Find("Invader3(Clone)");
+        Row1.SendMessage("Restart");
+        Row2.SendMessage("Restart");
+        Row3.SendMessage("Restart");
+        SpawnBarrier();
+    }
+
+    void SpawnPlayer()
+    {
+        Instantiate(Player, playerSpawnPoint.position, playerSpawnPoint.rotation);
+    }
+
+    void SpawnInvader1()
+    {
+        Instantiate(Invader1, enemySpawnPoint.position, enemySpawnPoint.rotation);
+    }
+
+    void SpawnInvader2()
+    {
+        Instantiate(Invader2, enemySpawnPoint.position, enemySpawnPoint.rotation);
+    }
+
+    void SpawnInvader3()
+    {
+        Instantiate(Invader3, enemySpawnPoint.position, enemySpawnPoint.rotation);
+    }
+
+    void SpawnBarrier()
+    {
+        Instantiate(Barrier, barrierSpawnPoint.position, barrierSpawnPoint.rotation);
+    }
+
+    void SpawnDisplay1()
+    {
+        Instantiate(Display1, Display1Spawn.position, Display1Spawn.rotation);
+        Display1Exists = true;
+    }
+
+    void SpawnDisplay2()
+    {
+        Instantiate(Display2, Display2Spawn.position, Display2Spawn.rotation);
+        Display2Exists = true;
+    }
+
+    void SpawnDisplay3()
+    {
+        Instantiate(Display3, Display3Spawn.position, Display3Spawn.rotation);
+        Display3Exists = true;
+    }
+
+    public void Row1DeathCounter()
+    {
+        ++totalRow1Killed;
+        Debug.Log("TotalRow1Killed" + totalRow1Killed);
+    }
+
+    public void Row2DeathCounter()
+    {
+        ++totalRow2Killed;
+        Debug.Log("TotalRow2Killed" + totalRow2Killed);
+    }
+
+    public void Row3DeathCounter()
+    {
+        ++totalRow3Killed;
+        Debug.Log("TotalRow3Killed" + totalRow3Killed);
+    }
+
+    public void Lose()
+    {
+        lose = true;
+        if (PlayerPrefs.GetInt("HighScore") < scoreSave)
+        {
+            PlayerPrefs.SetInt("HighScore", scoreSave);
+            PlayerPrefs.Save();
+        }
+    }
+
+    int Row1ScoreCalc(int x)
+    {
+        int Row1Score = x * 10;
+        return Row1Score;
+    }
+
+    int Row2ScoreCalc(int y)
+    {
+        int Row2Score = y * 20;
+        return Row2Score;
+    }
+
+    int Row3ScoreCalc(int z)
+    {
+        int Row3Score = z * 30;
+        return Row3Score;
+    }
+
+    void ScoreCalculator()
+    {
+        if (lose == true)
+        {
+            score = 0;
+        }
+        scoreSave = score;
+        score = Row1ScoreCalc(totalRow1Killed) + Row2ScoreCalc(totalRow2Killed) + Row3ScoreCalc(totalRow3Killed);
+        if (PlayerPrefs.GetInt("HighScore") < score)
+        {
+            PlayerPrefs.SetInt("HighScore", score);
+            PlayerPrefs.Save();
+        }
+    }
+
+    void OnGUI()
+    {
+        GUI.skin = layout;
+        PlayerPrefs.GetInt("HighScore");
+        string hiScoreString = PlayerPrefs.GetInt("HighScore").ToString();
+        if (menu == true)
+        {
+            if (Display1Exists == false)
+            {
+                SpawnDisplay1();
+            }
+            if (Display2Exists == false)
+            {
+                SpawnDisplay2();
+            }
+            if (Display3Exists == false)
+            {
+                SpawnDisplay3();
+            }
+            GUI.Label(new Rect(Screen.width/2 - 375, 210, 1000, 500), "10");
+            GUI.Label(new Rect(Screen.width/2 - 400, 230, 1000, 500), "Points");
+            GUI.Label(new Rect(Screen.width/2 - 12, 210, 1000, 500), "20");
+            GUI.Label(new Rect(Screen.width/2 - 40, 230, 1000, 500), "Points");
+            GUI.Label(new Rect(Screen.width/2 + 348, 210, 1000, 500), "30");
+            GUI.Label(new Rect(Screen.width/2 + 319, 230, 1000, 500), "Points");
+            GUI.Label(new Rect(Screen.width - 225, 775, 1000, 500), "Hi-Score");
+            GUI.Label(new Rect(Screen.width - 225, 800, 1000, 500), hiScoreString);
+            GUI.Label(new Rect(Screen.width / 2 - 135, 480, 1000, 500), "Left: Left Arrow Key");
+            GUI.Label(new Rect(Screen.width / 2 - 135, 510, 1000, 500), "Right: Right Arrow Key");
+            GUI.Label(new Rect(Screen.width / 2 - 135, 540, 1000, 500), "Shoot: Spacebar");
+            GUI.Label(new Rect(Screen.width / 2 - 135, 570, 1000, 500), "Quit: Escape");
+            if (GUI.Button(new Rect(Screen.width / 2 - 105, 330, 200, 106), "START"))
+            {
+                GameObject display1 = GameObject.Find("Invader1Display(Clone)");
+                GameObject display2 = GameObject.Find("Invader2Display(Clone)");
+                GameObject display3 = GameObject.Find("Invader3Display(Clone)");
+                Destroy(display1);
+                Destroy(display2);
+                Destroy(display3);
+                SpawnPlayer();
+                SpawnInvader1();
+                Row1Exists = true;
+                SpawnInvader2();
+                Row2Exists = true;
+                SpawnInvader3();
+                Row3Exists = true;
+                SpawnBarrier();
+                menu = false;
+            }
+        }
+        else if (menu == false)
+        {
+            ScoreCalculator();
+            GUI.Label(new Rect(15, 15, 1000, 500), "SCORE");
+            string scoreString = scoreSave.ToString();
+            GUI.Label(new Rect(15, 40, 1000, 500), scoreString);
+            string levelString = (levelScore + 1).ToString();
+            GUI.Label(new Rect(Screen.width - 100, 15, 1000, 500), "LEVEL");
+            GUI.Label(new Rect(Screen.width - 100, 40, 1000, 500), levelString);
+            GUI.Label(new Rect(Screen.width - 225, 775, 1000, 500), "Hi-Score");
+            GUI.Label(new Rect(Screen.width - 225, 800, 1000, 500), hiScoreString);
+            PlayerPrefs.Save();
+            if (lose == true)
+            {
+                Destroy(GameObject.Find("Enemy Bullet(Clone)"));
+                GUI.contentColor = Color.red;
+                Debug.Log("Game Over");
+                GUI.Label(new Rect(Screen.width / 2 - 65, 100, 1500, 750), "GAME OVER");
+                if (GUI.Button(new Rect(Screen.width / 2 - 60, 165, 120, 53), "RESTART"))
+                {
+                    GameObject barr = GameObject.Find("Barrier(Clone)");
+                    if (barr != null)
+                    {
+                        Destroy(barr);
+                    }
+                    Restart();
+                    Player.GetComponent<PlayerControls>().Restart();
+                    lose = false;
+                }
+                Debug.Log("Displaying Game Over Screen");
+            }
+        }
+    }
+
+    void Row1NotExist()
+    {
+        Row1Exists = false;
+        Debug.Log("Row1 does not exist");
+    }
+
+    void Row2NotExist()
+    {
+        Row2Exists = false;
+        Debug.Log("Row2 does not exist");
+    }
+
+    void Row3NotExist()
+    {
+        Row3Exists = false;
+        Debug.Log("Row3 does not exist");
+    }
+
+    void Update()
+    {
+        if (Row1Exists == false && Row2Exists == false && Row3Exists == false)
+        {
+            totalKilled = Row1Killed + Row2Killed + Row3Killed;
+            if (totalKilled % 33 == 0)
+            {
+                if (lose != true)
+                {
+                    if (menu != true)
+                    {
+                        GameObject barr = GameObject.Find("Barrier(Clone)");
+                        ++levelScore;
+                        if (GameObject.Find("Player(Clone)").GetComponent<PlayerControls>().health < 3)
+                        {
+                            GameObject.Find("Player(Clone)").GetComponent<PlayerControls>().health += 1;
+                        }
+                        Destroy(barr);
+                        SpawnInvader1();
+                        Row1Exists = true;
+                        SpawnInvader2();
+                        Row2Exists = true;
+                        SpawnInvader3();
+                        Row3Exists = true;
+                        SpawnBarrier();
+                    }
+                }
+            }
+        }
+        if (Input.GetKey("escape"))
+        {
+            Application.Quit();
+        }
+    }
+}
