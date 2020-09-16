@@ -1,0 +1,99 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using UnityEngine;
+
+public class Enemy : MonoBehaviour
+{
+    public Rigidbody2D rb2d;
+    public GameObject bulletPrefab;
+    public GameObject manager;
+    public Transform firePointEnemy;
+    public Collider2D enemyHitBox;
+    public int x = 1;
+    public int max;
+    public double health = 2;
+    public bool Row1;
+    public bool Row2;
+    public bool Row3;
+    bool dead = false;
+
+    public void TakeDamage(int damage)
+    {
+        health -= damage;
+        if (health < 0)
+        {
+            if (dead == false)
+            {
+                Die();
+            }
+        }
+    }
+
+    public void Die()
+    {
+        GameManager manager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        GameObject bullet = GameObject.Find("Bullet(Clone)");
+        if (Row1 == true)
+        {
+            manager.Row1DeathCounter();
+        }
+        if (Row2 == true)
+        {
+            manager.Row2DeathCounter();
+        }
+        if (Row3 == true)
+        {
+            manager.Row3DeathCounter();
+        }
+        bullet.SendMessage("DestroyBullet");
+        dead = true;
+        Destroy(gameObject);
+    }
+    void Shoot()
+    {
+        Instantiate(bulletPrefab, firePointEnemy.position, firePointEnemy.rotation);
+    }
+    bool checkFront()
+    {
+        RaycastHit2D check = Physics2D.Raycast(firePointEnemy.position, -firePointEnemy.up);
+        if (check)
+        {
+            Enemy enemy = check.transform.GetComponent<Enemy>();
+            if (enemy != null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        else
+        {
+            return true;
+        }
+    }
+    void Start()
+    {
+
+    }
+
+    // Update is called once per frame
+
+    int genRand;
+    void Update()
+    {
+        System.Random r = new System.Random();
+        int genRand = r.Next(0, max);
+        if (genRand == 0)
+        {
+            if (checkFront() == true)
+            {
+                UnityEngine.Debug.Log(max);
+                Shoot();
+                UnityEngine.Debug.Log("Enemy Fire");
+            }
+        }
+    }
+}
