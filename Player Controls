@@ -1,0 +1,129 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PlayerControls : MonoBehaviour
+{
+    public KeyCode moveLeft = KeyCode.LeftArrow;
+    public KeyCode moveRight = KeyCode.RightArrow;
+    //public KeyCode killSelf = KeyCode.K;
+    public float speed = 10.0f;
+    public float xBound = 7.5f;
+    private Rigidbody2D rb2d;
+    public double health = 30;
+    public bool dead = false;
+    GameObject manager;
+    public GameObject Row1;
+    public GameObject Row2;
+    public GameObject Row3;
+    public GUISkin layout;
+    UDPReceive udp;
+
+    public void TakeDamage(double damage)
+    {
+        health -= damage;
+        Debug.Log("Health = " + health);
+    }
+
+    public void Die()
+    {
+        GameObject player = GameObject.Find("Player(Clone)");
+        manager = GameObject.Find("GameManager");
+        Row1 = GameObject.Find("Invader1(Clone)");
+        Row2 = GameObject.Find("Invader2(Clone)");
+        Row3 = GameObject.Find("Invader3(Clone)");
+        dead = true;
+        manager.GetComponent<GameManager>().Lose();
+        if (Row1 != null)
+        {
+            Row1.GetComponent<RowMovement>().loss = true;
+
+        }
+        if (Row2 != null)
+        {
+            Row2.GetComponent<Row2Movement>().loss = true;
+        }
+        if (Row3 != null)
+        {
+            Row3.GetComponent<Row3Movement>().loss = true;
+        }
+        Destroy(player);
+    }
+    // Start is called before the first frame update
+    void Start()
+    {
+        udp = GameObject.Find("UDPCommands").GetComponent<UDPReceive>();
+        rb2d = GetComponent<Rigidbody2D>();
+        manager = GameObject.Find("GameManager");
+        Row1 = GameObject.Find("Invader1(Clone)");
+        Row2 = GameObject.Find("Invader2(Clone)");
+        Row3 = GameObject.Find("Invader3(Clone)");
+    }
+
+    public void Restart()
+    {
+        Debug.Log("Restarting");
+        dead = false;
+        health = 9;
+        var pos = transform.position;
+        pos.x = 0;
+        pos.y = -4.5f;
+        transform.position = pos;
+        Debug.Log("Health = " + health);
+    }
+    
+    void OnGUI()
+    {
+        if (health < 1)
+        {
+            Debug.Log("Player Died");
+            Die();
+        }
+        GUI.skin = layout;
+        string healthString = (health).ToString();
+        GUI.Label(new Rect(15, 775, 1000, 500), "Health");
+        GUI.Label(new Rect(15, 800, 1000, 500), healthString);
+    }
+
+    // Update is called once per frame
+    float priorMoveVal = 0;
+    float currentMoveVal = 0;
+    void FixedUpdate()
+    {
+        currentMoveVal = udp.joinAngles[4];
+        var vel = rb2d.velocity;
+        if (Input.GetKey(moveLeft))
+        {
+            vel.x = -speed;
+        }
+        else if (Input.GetKey(moveRight))
+        {
+            vel.x = speed;
+        }
+        if (currentMoveVal > priorMoveVal || currentMoveVal == 85)
+        {
+            vel.x = -.5f * speed;
+        }
+        else if (currentMoveVal < priorMoveVal || currentMoveVal == -85)
+        {
+            vel.x = .5f * speed;
+        }
+        else
+        {
+            vel.x = 0;
+        }
+        rb2d.velocity = vel;
+
+        var pos = transform.position;
+        if (pos.x > xBound-.5f)
+        {
+            pos.x = xBound-.5f;
+        }
+        else if (pos.x < -xBound)
+        {
+            pos.x = -xBound;
+        }
+        transform.position = pos;
+        priorMoveVal = currentMoveVal;
+    }
+}
