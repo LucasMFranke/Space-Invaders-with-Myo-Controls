@@ -1,0 +1,113 @@
+/*
+ 
+    -----------------------
+    UDP-Receive (send to)
+    -----------------------
+    // [url]http://msdn.microsoft.com/de-de/library/bb979228.aspx#ID0E3BAC[/url]
+   
+   
+    // > receive
+    // 127.0.0.1 : 8051
+   
+    // send
+    // nc -u 127.0.0.1 8051
+ 
+*/
+
+//from [url]https://forum.unity.com/threads/simple-udp-implementation-send-read-via-mono-c.15900/
+
+using UnityEngine;
+using System.Collections;
+
+using System;
+using System.Text;
+using System.Net;
+using System.Net.Sockets;
+using System.Threading;
+
+public class UDPReceive : MonoBehaviour
+{
+
+    // receiving Thread
+    Thread receiveThread;
+
+    // udpclient object
+    UdpClient client;
+
+    // public
+    // public string IP = "127.0.0.1"; default local
+    public int port; // define > init
+   
+
+    // infos
+    private string lastReceivedUDPPacket = "";
+
+    public float[] joinAngles = new float[27];
+
+    private float lastWrist = 0;
+    public float deltaWrist = 0;
+
+    // start from unity3d
+    public void Start()
+    {
+
+        init();
+    }
+
+   
+
+    // init
+    private void init()
+    {
+        Debug.Log("UDPSend.init()");
+
+        // define port
+        
+
+        // status
+        Debug.Log("Sending to 127.0.0.1 : " + port);
+        Debug.Log("Test-Sending to this Port: nc -u 127.0.0.1  " + port + "");
+        receiveThread = new Thread(new ThreadStart(ReceiveData));
+        receiveThread.IsBackground = true;
+        receiveThread.Start();
+
+    }
+
+    // receive thread
+    private void ReceiveData()
+    {
+
+        client = new UdpClient(port);
+        while (true)
+        {
+
+            try
+            {
+                IPEndPoint anyIP = new IPEndPoint(IPAddress.Any, 0);
+                byte[] data = client.Receive(ref anyIP);
+                for(int i = 0; i<data.Length; i += 4)
+                {
+                    joinAngles[i / 4] = BitConverter.ToSingle(data, i) * Mathf.Rad2Deg;
+                }
+                string text = joinAngles.ToString();
+                deltaWrist = joinAngles[4] - lastWrist;
+                Debug.Log(">> " + text);
+                lastWrist = joinAngles[4];
+
+                // latest UDPpacket
+                lastReceivedUDPPacket = text;
+
+               
+
+            }
+            catch (Exception err)
+            {
+                Debug.Log(err.ToString());
+            }
+        }
+    }
+
+    // getLatestUDPPacket
+    // cleans up the rest
+    
+}
