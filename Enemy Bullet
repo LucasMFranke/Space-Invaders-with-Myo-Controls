@@ -1,0 +1,46 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class EnemyBullet : MonoBehaviour
+{
+    public float speed = 2.5f;
+    public Rigidbody2D rb2d;
+    public double barrierDamage = 1;
+    public double playerDamage = 1;
+    // Start is called before the first frame update
+    void Start()
+    {
+        rb2d.velocity = -transform.up * speed;
+    }
+    void OnTriggerEnter2D(Collider2D hitInfo)
+    {
+        Barrier barrier = hitInfo.GetComponent<Barrier>();
+        PlayerControls player = hitInfo.GetComponent<PlayerControls>();
+        Enemy enemy = hitInfo.GetComponent<Enemy>();
+        Bullet bullet = hitInfo.GetComponent<Bullet>();
+        if (player != null)
+        {
+            Destroy(gameObject);
+            player.TakeDamage(playerDamage);
+            Debug.Log("Enemy hit Player");
+        }
+        else if (barrier != null)
+        {
+            barrier.TakeDamage(barrierDamage);
+            Destroy(gameObject);
+            Debug.Log("Enemy hit Barrier");
+        }
+        else if (enemy != null)
+        {
+            Debug.Log("Enemy hit Enemy");
+            Destroy(gameObject);
+        }
+        else if (bullet != null)
+        {
+            Debug.Log("Enemy hit bullet");
+            Destroy(gameObject);
+        }
+        Destroy(gameObject);
+    }
+}
