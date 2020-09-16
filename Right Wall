@@ -1,0 +1,39 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class RightWall : MonoBehaviour
+{
+    public Rigidbody2D rb2d;
+    public Collider2D coll;
+    public bool rightEnemyDetected = false;
+    // Start is called before the first frame update
+    void Start()
+    {
+
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
+    public IEnumerator Waiter()
+    {
+        yield return new WaitForSeconds(2f);
+    }
+    public void OnTriggerEnter2D(Collider2D collis)
+    {
+        Enemy enemy = collis.GetComponent<Enemy>();
+        if (enemy != null)
+        {
+            Debug.Log("Wall found enemy");
+            rightEnemyDetected = true;
+        }
+    }
+    public void OnTriggerExit2D(Collider2D collis)
+    {
+        Debug.Log("Wall lost enemy");
+        rightEnemyDetected = false;
+    }
+}
