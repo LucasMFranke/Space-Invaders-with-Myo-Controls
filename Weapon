@@ -1,0 +1,53 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Weapon : MonoBehaviour
+{
+    public Transform firePoint;
+    public GameObject bulletPrefab;
+    //vars below are for later use
+    /*float priorShootVal = 0;
+    float currentShootVal = 0;
+    UDPReceive udp;*/
+
+    void Start()
+    {
+        //udp = GameObject.Find("UDPCommands").GetComponent<UDPReceive>();
+    }
+
+    //FixedUpdate is called once every .02 seconds
+    int adder = 0;
+    void FixedUpdate()
+    {
+        //commented out so that if I want to implement the ability to shoot later
+        /*currentShootVal = udp.joinAngles[3]; 
+        if (Input.GetButtonDown("Fire1"))
+        {
+            Debug.Log("Fire");
+            Shoot();
+        }
+        if (adder % 5 == 0)
+        {
+            if (currentShootVal != priorShootVal)
+            {
+                Debug.Log("Fire");
+                Shoot();
+                priorShootVal = currentShootVal;
+                adder++;
+            }
+        }
+        */
+        if (adder % 20 == 0)
+        {
+            Debug.Log("Fire");
+            Shoot();
+        }
+        adder++;
+    }
+
+    void Shoot()
+    {
+        Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+    }
+}
