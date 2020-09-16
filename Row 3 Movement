@@ -1,0 +1,319 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Row3Movement : MonoBehaviour
+{
+    public Rigidbody2D rb2d;
+
+    public float speed = .5f;
+    bool movingLeft = true;
+    bool movingRight = false;
+    bool leftWallHit;
+    bool rightWallHit;
+    public int rowCount;
+    public int totalCount;
+    public bool loss = false;
+    GameObject Manager;
+    GameObject Invader1;
+    GameObject Invader2;
+    bool Row2 = true;
+    bool Row1 = true;
+    // Start is called before the first frame update
+    void Start()
+    {
+        ended = false;
+        transform.position = new Vector2(-6.5f, 3.75f);
+        Manager = GameObject.Find("GameManager");
+        Invader1 = GameObject.Find("Invader1(Clone)");
+        Invader2 = GameObject.Find("Invader2(Clone)");
+    }
+
+    //float boundXRight = -5.5f;
+    //float boundXLeft = -10f;
+    // Update is called once per frame
+    void Update()
+    {
+        rowCount = transform.childCount;
+        bool Row1Loss = false;
+        bool Row2Loss = false;
+        if (Row2 == true)
+        {
+            if (Row1 == true)
+            {
+                totalCount = rowCount + Invader2.GetComponent<Row2Movement>().rowCount + Invader1.GetComponent<RowMovement>().rowCount;
+                Row2Loss = Invader2.GetComponent<Row2Movement>().loss;
+                Row1Loss = Invader1.GetComponent<RowMovement>().loss;
+            }
+            else if (Row1 == false)
+            {
+                totalCount = rowCount + Invader2.GetComponent<Row2Movement>().rowCount;
+                Row2Loss = Invader2.GetComponent<Row2Movement>().loss;
+            }
+        }
+        else if (Row2 == false)
+        {
+            if (Row1 == true)
+            {
+                totalCount = rowCount + Invader1.GetComponent<RowMovement>().rowCount;
+                Row1Loss = Invader1.GetComponent<RowMovement>().loss;
+            }
+            else if (Row1 == false)
+            {
+                totalCount = rowCount;
+            }
+        }
+        if (totalCount == 33)
+        {
+            speed = .2f;
+        }
+        else if (totalCount == 32)
+        {
+            speed = .25f;
+        }
+        else if (totalCount == 31)
+        {
+            speed = .3f;
+        }
+        else if (totalCount == 30)
+        {
+            speed = .35f;
+        }
+        else if (totalCount == 29)
+        {
+            speed = .4f;
+        }
+        else if (totalCount == 28)
+        {
+            speed = .45f;
+        }
+        else if (totalCount == 27)
+        {
+            speed = .5f;
+        }
+        else if (totalCount == 26)
+        {
+            speed = .55f;
+        }
+        else if (totalCount == 25)
+        {
+            speed = .6f;
+        }
+        else if (totalCount == 24)
+        {
+            speed = .65f;
+        }
+        else if (totalCount == 23)
+        {
+            speed = .7f;
+        }
+        else if (totalCount == 22)
+        {
+            speed = .75f;
+        }
+        else if (totalCount == 21)
+        {
+            speed = .8f;
+        }
+        else if (totalCount == 20)
+        {
+            speed = .85f;
+        }
+        else if (totalCount == 19)
+        {
+            speed = .9f;
+        }
+        else if (totalCount == 18)
+        {
+            speed = .95f;
+        }
+        else if (totalCount == 17)
+        {
+            speed = 1f;
+        }
+        else if (totalCount == 16)
+        {
+            speed = 1.05f;
+        }
+        else if (totalCount == 15)
+        {
+            speed = 1.1f;
+        }
+        else if (totalCount == 14)
+        {
+            speed = 1.15f;
+        }
+        else if (totalCount == 13)
+        {
+            speed = 1.2f;
+        }
+        else if (totalCount == 12)
+        {
+            speed = 1.25f;
+        }
+        else if (totalCount == 11)
+        {
+            speed = 1.3f;
+        }
+        else if (totalCount == 10)
+        {
+            speed = 1.35f;
+        }
+        else if (totalCount == 9)
+        {
+            speed = 1.4f;
+        }
+        else if (totalCount == 8)
+        {
+            speed = 1.45f;
+        }
+        else if (totalCount == 7)
+        {
+            speed = 1.5f;
+        }
+        else if (totalCount == 6)
+        {
+            speed = 1.55f;
+        }
+        else if (totalCount == 5)
+        {
+            speed = 1.6f;
+        }
+        else if (totalCount == 4)
+        {
+            speed = 1.65f;
+        }
+        else if (totalCount == 3)
+        {
+            speed = 1.7f;
+        }
+        else if (totalCount == 2)
+        {
+            speed = 1.75f;
+        }
+        else if (totalCount == 1)
+        {
+            speed = 1.8f;
+        }
+        if (rowCount == 0)
+        {
+            if (Invader2 != null)
+            {
+                Invader2.SendMessage("Row3NotExist");
+                Debug.Log("Successfully sent message to Row 2");
+            }
+            if (Invader1 != null)
+            {
+                Invader1.SendMessage("Row3NotExist");
+                Debug.Log("Successfully sent message to Row 1");
+            }
+            GameManager gameManager = Manager.GetComponent<GameManager>();
+            Manager.SendMessage("Row3NotExist");
+            Debug.Log("Row3 does not exist");
+            GameObject Invader3 = GameObject.Find("Invader3(Clone)");
+            Manager.SendMessage("Row3NotExist");
+            Destroy(Invader3);
+        }
+        leftWallHit = GameObject.Find("LeftWall").GetComponent<LeftWall>().leftEnemyDetected;
+        Debug.Log("Left: " + leftWallHit);
+        rightWallHit = GameObject.Find("RightWall").GetComponent<RightWall>().rightEnemyDetected;
+        Debug.Log("Right: " + rightWallHit);
+        if (movingLeft == true)
+        {
+            if (leftWallHit == false)
+            {
+                MoveLeft();
+                rightWallHit = false;
+            }
+            else if (leftWallHit == true)
+            {
+                transform.position += new Vector3(0, -.5f, 0);
+                movingLeft = false;
+                movingRight = true;
+            }
+        }
+        if (movingRight == true)
+        {
+            if (rightWallHit == false)
+            {
+                MoveRight();
+            }
+            else if (rightWallHit == true)
+            {
+                transform.position += new Vector3(0, -.5f, 0);
+                movingLeft = true;
+                movingRight = false;
+            }
+        }
+        if (transform.position.y <= -4)
+        {
+            loss = true;
+            Manager.SendMessage("Row3NotExist");
+            Manager.SendMessage("Lose", null);
+            if (ended == false)
+            {
+                End();
+                ended = true;
+            }
+        }
+        if (Row1Loss == true)
+        {
+            loss = true;
+            Manager.SendMessage("Row3NotExist");
+            if (ended == false)
+            {
+                End();
+                ended = true;
+            }
+        }
+        if (Row2Loss == true)
+        {
+            loss = true;
+            Manager.SendMessage("Row3NotExist");
+            if (ended == false)
+            {
+                End();
+                ended = true;
+            }
+        }
+    }
+    void MoveLeft()
+    {
+        transform.position += new Vector3(-speed * Time.deltaTime, 0, 0);
+    }
+
+    void MoveRight()
+    {
+        transform.position += new Vector3(speed * Time.deltaTime, 0, 0);
+    }
+
+    bool ended = false;
+    public void End()
+    {
+        Debug.Log("Ending Row3");
+        GameObject Invader3 = GameObject.Find("Invader3(Clone)");
+        Manager.SendMessage("Row3NotExist");
+        Destroy(Invader3);
+        ended = true;
+    }
+
+    public void Lose()
+    {
+        loss = true;
+    }
+
+    public void Restart()
+    {
+        loss = false;
+    }
+
+    void Row1NotExist()
+    {
+        Row1 = false;
+    }
+
+    void Row2NotExist()
+    {
+        Row2 = false;
+    }
+}
