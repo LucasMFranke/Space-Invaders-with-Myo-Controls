@@ -1,0 +1,37 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Bullet : MonoBehaviour
+{
+    public float speed = 20f;
+    public Rigidbody2D rb2d;
+    public int damage = 1;
+    // Start is called before the first frame update
+    void Start()
+    {
+        rb2d.velocity = transform.up * speed;
+    }
+
+    void DestroyBullet()
+    {
+        Destroy(gameObject);
+    }
+
+    void OnTriggerEnter2D(Collider2D hitInfo)
+    {
+        Enemy enemy = hitInfo.GetComponent<Enemy>();
+        EnemyBullet enemyBullet = hitInfo.GetComponent<EnemyBullet>();
+        if (enemy != null)
+        {
+            enemy.TakeDamage(damage);
+            Destroy(gameObject);
+            Debug.Log(damage);
+        }
+        if (enemyBullet != null)
+        {
+            Destroy(gameObject);
+        }
+        Destroy(gameObject);
+    }
+}
