@@ -1,0 +1,31 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Barrier : MonoBehaviour
+{
+    public double durability = 1;
+    public void TakeDamage(double damage)
+    {
+        durability -= damage;
+        if (durability <= 0)
+        {
+            Break();
+        }
+    }
+    public void Break()
+    {
+        Destroy(gameObject);
+    }
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+}
